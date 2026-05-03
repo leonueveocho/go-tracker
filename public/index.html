@@ -10,6 +10,439 @@
 <title>Madec Nicolau · Go Tracker</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f5f4f0;--bg3:#eeedea;--text:#1a1a18;--text2:#73726c;--text3:#9c9a92;--border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);--info-bg:#e6f1fb;--info:#0C447C;--success-bg:#eaf3de;--success:#27500A;--danger-bg:#fcebeb;--danger:#791F1F;--warn-bg:#faeeda;--warn:#633806;--blue:#185FA5;--green:#3B6D11;--red:#A32D2D;--radius:8px;--radius-lg:12px}
+@media(prefers-color-scheme:dark){:root{--bg:#1e1e1c;--bg2:#2a2a28;--bg3:#323230;--text:#e8e6de;--text2:#9c9a92;--text3:#73726c;--border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22);--info-bg:#0c2a45;--info:#85B7EB;--success-bg:#162308;--success:#97C459;--danger-bg:#2a0a0a;--danger:#F09595;--warn-bg:#2a1a05;--warn:#FAC775;--blue:#378ADD;--green:#639922;--red:#E24B4A}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:var(--bg3);color:var(--text);min-height:100vh}
+.app{max-width:640px;margin:0 auto;padding:0 0 80px}
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.profile-row{display:flex;align-items:center;gap:10px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--info-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--info);flex-shrink:0}
+.pname{font-size:15px;font-weight:600}
+.pclub{font-size:11px;color:var(--text2);margin-top:1px}
+.right-bar{display:flex;align-items:center;gap:6px}
+.pill{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.pill-ok{background:var(--success-bg);color:var(--success)}
+.pill-err{background:var(--danger-bg);color:var(--danger)}
+.pill-load{background:var(--warn-bg);color:var(--warn)}
+.pill-new{background:var(--info-bg);color:var(--info)}
+.rbtn{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--border2);background:transparent;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rbtn:disabled{opacity:.4}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.alert{background:var(--info-bg);color:var(--info);padding:10px 16px;font-size:13px;display:none;align-items:center;gap:8px;font-weight:500}
+.section{padding:12px 16px 0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.metric{background:var(--bg);border-radius:var(--radius);padding:10px 12px;border:0.5px solid var(--border)}
+.mlabel{font-size:10px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.mval{font-size:20px;font-weight:600}
+.msub{font-size:10px;color:var(--text3);margin-top:2px}
+.form-dots{display:flex;gap:4px;margin-top:6px}
+.dot{width:13px;height:13px;border-radius:50%}
+.dot-g{background:var(--green)}.dot-l{background:var(--red)}.dot-u{background:var(--bg3);border:0.5px solid var(--border)}
+.tabs{display:flex;background:var(--bg);border-bottom:0.5px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{flex:1;min-width:80px;font-size:13px;padding:10px 8px;text-align:center;border:none;background:none;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.pane{display:none;padding:12px 16px}.pane.active{display:block}
+.card{background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:14px;margin-bottom:12px}
+.ctitle{font-size:13px;font-weight:600;margin-bottom:12px}
+.toggle-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tbtn{font-size:12px;padding:4px 10px;border-radius:6px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer}
+.tbtn.on{background:var(--info-bg);color:var(--info);border-color:transparent;font-weight:600}
+.frow{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.frow label{font-size:12px;color:var(--text2)}
+.frow select{font-size:12px;padding:4px 8px;border-radius:6px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text)}
+.legend{display:flex;gap:12px;margin-bottom:8px;font-size:11px;color:var(--text2);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px}
+.ldot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th{text-align:left;padding:5px 6px;color:var(--text2);font-weight:500;font-size:11px;border-bottom:0.5px solid var(--border)}
+td{padding:7px 6px;border-bottom:0.5px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;font-size:11px;padding:2px 6px;border-radius:4px;font-weight:600}
+.bw{background:var(--success-bg);color:var(--success)}.bl{background:var(--danger-bg);color:var(--danger)}
+.h2h-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.h2h-row:last-child{border-bottom:none}
+.h2h-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.h2h-niv{font-size:11px;color:var(--text2)}
+.h2h-bar-wrap{width:70px;height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;flex-shrink:0}
+.h2h-bar{height:100%;background:var(--blue);border-radius:4px}
+.h2h-score{font-size:11px;color:var(--text2);min-width:56px;text-align:right;flex-shrink:0}
+.palm-item{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.palm-item:last-child{border-bottom:none}
+.rank{font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.r1{background:#FAEEDA;color:#633806}.r2{background:#E6F1FB;color:#0C447C}.r3{background:var(--bg3);color:var(--text2)}
+.lupd{font-size:11px;color:var(--text3);text-align:center;padding:8px 0}
+.empty{text-align:center;color:var(--text2);padding:2rem;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="profile-row">
+    <div class="avatar">MN</div>
+    <div>
+      <div class="pname">Madec Nicolau</div>
+      <div class="pclub">Go Seigen · Balma · FFG live</div>
+    </div>
+  </div>
+  <div class="right-bar">
+    <span id="pill" class="pill pill-load">…</span>
+    <button class="rbtn" id="rbtn" onclick="loadData()"><span id="spin">↻</span></button>
+  </div>
+</div>
+
+<div id="alert" class="alert"><span style="font-size:15px;flex-shrink:0">!</span><span id="alert-text"></span></div>
+
+<div class="section" style="padding-top:12px">
+  <div class="metrics">
+    <div class="metric"><div class="mlabel">Principale</div><div class="mval" id="m-g">—</div><div class="msub" id="m-s">—</div></div>
+    <div class="metric"><div class="mlabel">Hybride</div><div class="mval" id="m-hg">—</div><div class="msub" id="m-hs">—</div></div>
+    <div class="metric"><div class="mlabel">Tournois</div><div class="mval" id="m-t">—</div><div class="msub" id="m-b">—</div></div>
+  </div>
+  <div class="metrics" style="grid-template-columns:1fr 1fr">
+    <div class="metric"><div class="mlabel">Bilan global</div><div class="mval" id="m-bilan">—</div><div class="msub" id="m-pct">—</div></div>
+    <div class="metric"><div class="mlabel">Forme (5 parties)</div><div class="form-dots" id="form-dots" style="margin-top:10px"></div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('prog',this)">Progression</button>
+  <button class="tab" onclick="showTab('parties',this)">Parties</button>
+  <button class="tab" onclick="showTab('h2h',this)">Tête-à-tête</button>
+  <button class="tab" onclick="showTab('palm',this)">Palmarès</button>
+</div>
+
+<div id="pane-prog" class="pane active">
+  <div class="card">
+    <div class="ctitle">Évolution du score</div>
+    <div class="toggle-row">
+      <button class="tbtn on" onclick="switchScale('p',this)">Principale</button>
+      <button class="tbtn" onclick="switchScale('h',this)">Hybride</button>
+    </div>
+    <div class="frow">
+      <label>Période :</label>
+      <select id="period-gor" onchange="buildChart()">
+        <option value="all">Tout</option>
+        <option value="12">12 mois</option>
+        <option value="6">6 mois</option>
+        <option value="3">3 mois</option>
+      </select>
+    </div>
+    <div class="legend"><span><span class="ldot" style="background:#185FA5"></span>Score</span></div>
+    <div style="position:relative;width:100%;height:190px"><canvas id="cgor" role="img" aria-label="Évolution score">—</canvas></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Bilan V/D par tournoi (12 derniers)</div>
+    <div class="legend">
+      <span><span class="ldot" style="background:#3B6D11"></span>Victoires</span>
+      <span><span class="ldot" style="background:#A32D2D"></span>Défaites</span>
+    </div>
+    <div style="position:relative;width:100%" id="bar-wrap"><canvas id="cbar" role="img" aria-label="Bilan tournois">—</canvas></div>
+  </div>
+</div>
+
+<div id="pane-parties" class="pane">
+  <div class="card">
+    <div class="ctitle">Résultats détaillés</div>
+    <div class="frow">
+      <label>Période :</label>
+      <select id="period-g" onchange="buildGames()">
+        <option value="all">Tout</option>
+        <option value="12">12 mois</option>
+        <option value="6">6 mois</option>
+        <option value="3">3 mois</option>
+      </select>
+      <select id="filter-r" onchange="buildGames()">
+        <option value="all">Toutes</option>
+        <option value="G">Gagnées</option>
+        <option value="P">Perdues</option>
+      </select>
+    </div>
+    <table>
+      <thead><tr>
+        <th style="width:28%">Tournoi</th>
+        <th style="width:14%">Date</th>
+        <th style="width:22%">Adversaire</th>
+        <th style="width:9%">Niv.</th>
+        <th style="width:14%">Résultat</th>
+        <th style="width:13%">Var.</th>
+      </tr></thead>
+      <tbody id="games-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="pane-h2h" class="pane">
+  <div class="card">
+    <div class="ctitle">Tête-à-tête (≥ 2 parties)</div>
+    <div id="h2h-list"></div>
+  </div>
+</div>
+
+<div id="pane-palm" class="pane">
+  <div class="card">
+    <div class="ctitle">Palmarès FFG</div>
+    <div id="palm-list"></div>
+  </div>
+</div>
+
+<div class="lupd" id="lupd"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const API='/api/ffg';
+let S={tournaments:[],games:[],palmares:[],scaleP:[],scaleH:[],gradeP:'',gradeH:'',scoreP:null,scoreH:null,scale:'p',lastCount:null};
+let CH={};
+
+async function loadData(){
+  const rbtn=document.getElementById('rbtn'),spin=document.getElementById('spin');
+  rbtn.disabled=true;spin.className='spin';
+  setPill('load','Chargement…');
+  try{
+    const r=await fetch(API,{signal:AbortSignal.timeout(12000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const html=await r.text();
+    parse(html);
+    const now=new Date();
+    document.getElementById('lupd').textContent='Mis à jour le '+now.toLocaleDateString('fr-FR')+' à '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    setPill('ok','En direct');
+  }catch(e){
+    setPill('err','Erreur — réessayez');
+  }finally{
+    rbtn.disabled=false;spin.className='';
+  }
+}
+
+function setPill(t,txt){const el=document.getElementById('pill');el.className='pill pill-'+t;el.textContent=txt;}
+
+function parse(html){
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const body=doc.body?doc.body.innerText:'';
+
+  // Grade : chercher "Échelle principale : 2d" etc.
+  const mP=body.match(/Échelle principale\s*:\s*(\S+)/);
+  const mH=body.match(/Échelle hybride\s*:\s*(\S+)/);
+  S.gradeP=mP?mP[1]:'';
+  S.gradeH=mH?mH[1]:'';
+
+  const tournaments=[],games=[],scaleP=[],scaleH=[],palmares=[];
+
+  // Cibler uniquement les tableaux de tournoi (class="simple tournoi")
+  const tournamentTables=doc.querySelectorAll('table.tournoi');
+
+  tournamentTables.forEach(table=>{
+    // Remonter au h4 précédent pour trouver le nom et la date
+    let h4=table.previousElementSibling;
+    while(h4&&h4.tagName!=='H4') h4=h4.previousElementSibling;
+    if(!h4) return;
+
+    const link=h4.querySelector('a');
+    const name=link?link.textContent.trim():h4.textContent.trim();
+
+    // Le paragraphe entre h4 et table contient date + scores d'échelle
+    let info=h4.nextElementSibling;
+    let dateStr='';
+    while(info&&info!==table){
+      if(info.tagName==='P'||info.nodeType===Node.TEXT_NODE||info.tagName==='DIV'||info.tagName==='SPAN'||info.tagName==='SMALL'){
+        const txt=info.textContent||'';
+        const dm=txt.match(/(\d{2}-\d{2}-\d{4})/);
+        if(dm&&!dateStr) dateStr=dm[1].split('-').reverse().join('-');
+        // Échelle principale : "avant : 204, après : 207"
+        const spM=txt.match(/principale[^/]*avant\s*:\s*(-?\d+)[^/]*après\s*:\s*(-?\d+)/i);
+        // Échelle hybride : "avant : 211, après : 214"
+        const spH=txt.match(/hybride[^/]*avant\s*:\s*(-?\d+)[^/]*après\s*:\s*(-?\d+)/i);
+        if(spM) scaleP.push({date:dateStr,before:+spM[1],after:+spM[2],label:name});
+        if(spH) scaleH.push({date:dateStr,before:+spH[1],after:+spH[2],label:name});
+      }
+      info=info.nextElementSibling;
+    }
+
+    // Parser les lignes du tableau
+    // Colonnes : [0]Couleur [1]Hd [2]Adversaire [3]Niveau [4]Son score [5]Résultat [6]Var [7]Var Hybride
+    let w=0,l=0;
+    table.querySelectorAll('tbody tr').forEach(row=>{
+      const cells=row.querySelectorAll('td');
+      if(cells.length<6) return;
+      const adv=cells[2].textContent.trim();
+      const niv=cells[3].textContent.trim();
+      const res=cells[5].textContent.trim(); // RÉSULTAT = cells[5]
+      const varT=cells[6]?cells[6].textContent.trim():'';
+      const ok=res==='Gagnée';
+      if(ok) w++; else l++;
+      games.push({tournoi:name,date:dateStr,adversaire:adv,niveau:niv,resultat:ok?'G':'P',variation:varT});
+    });
+    if(w+l>0) tournaments.push({name,date:dateStr,w,l});
+  });
+
+  // Parser le palmarès depuis les sections h4 Gagnant/Second/Troisième
+  let palmSection='';
+  doc.querySelectorAll('h4,li').forEach(el=>{
+    if(el.tagName==='H4'){
+      const t=el.textContent.trim();
+      if(['Gagnant','Second','Troisième'].includes(t)) palmSection=t;
+      else palmSection='';
+      return;
+    }
+    if(el.tagName==='LI'&&palmSection){
+      const txt=el.textContent.trim().replace(/\s+/g,' ');
+      if(txt.length>5) palmares.push({rank:palmSection==='Gagnant'?1:palmSection==='Second'?2:3,text:txt});
+    }
+  });
+
+  scaleP.sort((a,b)=>a.date.localeCompare(b.date));
+  scaleH.sort((a,b)=>a.date.localeCompare(b.date));
+  tournaments.sort((a,b)=>a.date.localeCompare(b.date));
+
+  const lp=scaleP.length?scaleP[scaleP.length-1].after:null;
+  const lh=scaleH.length?scaleH[scaleH.length-1].after:null;
+
+  const prev=S.lastCount,curr=tournaments.length;
+  if(prev!==null&&curr>prev){
+    const diff=curr-prev;
+    document.getElementById('alert-text').textContent=diff+' nouveau'+(diff>1?'x':'')+' tournoi'+(diff>1?'s':'')+' détecté'+(diff>1?'s':'')+' !';
+    document.getElementById('alert').style.display='flex';
+    setPill('new','Nouveau !');
+  }
+  S.lastCount=curr;
+  Object.assign(S,{tournaments,games,scaleP,scaleH,palmares,scoreP:lp,scoreH:lh});
+  render();
+}
+
+function render(){
+  document.getElementById('m-g').textContent=S.gradeP||'—';
+  document.getElementById('m-s').textContent=S.scoreP!==null?'Score: '+S.scoreP:'';
+  document.getElementById('m-hg').textContent=S.gradeH||'—';
+  document.getElementById('m-hs').textContent=S.scoreH!==null?'Score: '+S.scoreH:'';
+  document.getElementById('m-t').textContent=S.tournaments.length;
+  const w=S.games.filter(g=>g.resultat==='G').length,l=S.games.filter(g=>g.resultat==='P').length;
+  document.getElementById('m-bilan').textContent=w+'V '+l+'D';
+  document.getElementById('m-pct').textContent=w+l>0?Math.round(w/(w+l)*100)+'%':'';
+  const last5=S.games.slice(-5);
+  document.getElementById('form-dots').innerHTML=
+    last5.map(g=>`<div class="dot ${g.resultat==='G'?'dot-g':'dot-l'}" title="${g.adversaire}"></div>`).join('')+
+    Array(Math.max(0,5-last5.length)).fill('<div class="dot dot-u"></div>').join('');
+  setTimeout(()=>{buildChart();buildBarChart();buildGames();buildH2H();buildPalmares();},60);
+}
+
+function period(arr,m,k='date'){
+  if(!m||m==='all') return arr;
+  const cut=new Date();cut.setMonth(cut.getMonth()-+m);
+  return arr.filter(d=>new Date(d[k])>=cut);
+}
+
+function switchScale(s,btn){
+  S.scale=s;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildChart();
+}
+
+function buildChart(){
+  const p=document.getElementById('period-gor')?.value||'all';
+  const raw=S.scale==='p'?S.scaleP:S.scaleH;
+  const data=period(raw,p);
+  if(!data.length) return;
+  const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const gc=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)',tc=isDark?'#9c9a92':'#73726c';
+  if(CH.gor) CH.gor.destroy();
+  CH.gor=new Chart(document.getElementById('cgor'),{
+    type:'line',
+    data:{labels:data.map(d=>d.date?d.date.substring(0,7):''),datasets:[{label:'Score',data:data.map(d=>d.after),borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.07)',borderWidth:1.5,pointRadius:2,tension:0.3,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:ctx=>data[ctx[0].dataIndex].label,label:ctx=>'Score: '+ctx.parsed.y}}},scales:{x:{ticks:{color:tc,font:{size:10},maxTicksLimit:6},grid:{color:gc}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}}}
+  });
+}
+
+function buildBarChart(){
+  const recent=S.tournaments.slice(-12);
+  if(!recent.length) return;
+  const h=Math.max(recent.length*34+50,100);
+  document.getElementById('bar-wrap').style.height=h+'px';
+  const isDark=matchMedia('(prefers-color-scheme:dark)').matches,tc=isDark?'#9c9a92':'#73726c';
+  if(CH.bar) CH.bar.destroy();
+  CH.bar=new Chart(document.getElementById('cbar'),{
+    type:'bar',
+    data:{labels:recent.map(t=>t.name.length>18?t.name.substring(0,18)+'…':t.name),datasets:[
+      {label:'Victoires',data:recent.map(t=>t.w),backgroundColor:'#3B6D11',borderRadius:3,barThickness:9},
+      {label:'Défaites',data:recent.map(t=>-t.l),backgroundColor:'#A32D2D',borderRadius:3,barThickness:9}
+    ]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+Math.abs(ctx.parsed.x)}}},scales:{x:{ticks:{color:tc,font:{size:10},callback:v=>Math.abs(v)},grid:{color:isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)'}},y:{ticks:{color:tc,font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+function buildGames(){
+  const p=document.getElementById('period-g').value,r=document.getElementById('filter-r').value;
+  let data=period(S.games,p);
+  if(r!=='all') data=data.filter(g=>g.resultat===r);
+  data=[...data].reverse();
+  const body=document.getElementById('games-body');
+  if(!data.length){body.innerHTML='<tr><td colspan="6" class="empty">Aucune partie</td></tr>';return;}
+  body.innerHTML=data.map(g=>{
+    const badge=g.resultat==='G'?'<span class="badge bw">Gagné</span>':'<span class="badge bl">Perdu</span>';
+    const vc=g.variation&&g.variation.startsWith('+')?'color:var(--success)':'color:var(--danger)';
+    return `<tr>
+      <td title="${g.tournoi}">${g.tournoi.length>16?g.tournoi.substring(0,16)+'…':g.tournoi}</td>
+      <td>${g.date?g.date.substring(0,7):''}</td>
+      <td title="${g.adversaire}">${g.adversaire.length>14?g.adversaire.substring(0,14)+'…':g.adversaire}</td>
+      <td>${g.niveau}</td>
+      <td>${badge}</td>
+      <td style="${vc};font-size:11px">${g.variation}</td>
+    </tr>`;
+  }).join('');
+}
+
+function buildH2H(){
+  const h2h={};
+  S.games.forEach(g=>{
+    if(!h2h[g.adversaire]) h2h[g.adversaire]={w:0,l:0,niv:g.niveau};
+    if(g.resultat==='G') h2h[g.adversaire].w++; else h2h[g.adversaire].l++;
+  });
+  const sorted=Object.entries(h2h).filter(([,v])=>v.w+v.l>=2).sort((a,b)=>(b[1].w+b[1].l)-(a[1].w+a[1].l));
+  const el=document.getElementById('h2h-list');
+  if(!sorted.length){el.innerHTML='<div class="empty">Pas encore assez de données.</div>';return;}
+  el.innerHTML=sorted.map(([name,v])=>{
+    const tot=v.w+v.l,pct=Math.round(v.w/tot*100);
+    return `<div class="h2h-row">
+      <div class="h2h-name">${name} <span class="h2h-niv">${v.niv}</span></div>
+      <div class="h2h-bar-wrap"><div class="h2h-bar" style="width:${pct}%"></div></div>
+      <div class="h2h-score">${v.w}V ${v.l}D (${pct}%)</div>
+    </div>`;
+  }).join('');
+}
+
+function buildPalmares(){
+  const el=document.getElementById('palm-list');
+  if(!S.palmares.length){el.innerHTML='<div class="empty">Chargement…</div>';return;}
+  el.innerHTML=S.palmares.map(p=>{
+    const cls=p.rank===1?'r1':p.rank===2?'r2':'r3',lbl=p.rank===1?'1er':p.rank===2?'2e':'3e';
+    return `<div class="palm-item"><span class="rank ${cls}">${lbl}</span>${p.text}</div>`;
+  }).join('');
+}
+
+function showTab(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='prog') setTimeout(()=>{buildChart();buildBarChart();},50);
+}
+
+loadData();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MN Go">
+<meta name="theme-color" content="#185FA5">
+<title>Madec Nicolau · Go Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#fff;--bg2:#f5f4f0;--bg3:#eeedea;
   --text:#1a1a18;--text2:#73726c;--text3:#9c9a92;
